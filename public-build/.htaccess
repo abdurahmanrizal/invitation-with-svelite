@@ -1,0 +1,27 @@
+# HTACCESS for static SvelteKit build
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Handle API requests - don't rewrite
+    RewriteRule ^api/ - [L]
+
+    # Handle static files
+    RewriteRule ^(assets|_app|images|fonts|css|js)/ - [L]
+
+    # Fallback to index.html for SPA routing
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.html [L,QSA]
+</IfModule>
+
+# Security headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# Gzip compression
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css application/javascript application/json
+</IfModule>

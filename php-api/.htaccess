@@ -1,0 +1,17 @@
+# Rewrite for API endpoints
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Handle reservation by code (GET/POST for check-in)
+    RewriteRule ^reservation/(.+)$ reservation.php?code=$1 [L,QSA]
+
+    # Handle reservation by ID (PUT/DELETE for admin)
+    RewriteRule ^reservations/(\d+)$ reservation-id.php?id=$1 [L,QSA]
+
+    # Handle all reservations list (GET/POST)
+    RewriteRule ^reservations$ reservations.php [L,QSA]
+
+    # For direct file access
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+</IfModule>

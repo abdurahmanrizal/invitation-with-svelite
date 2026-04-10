@@ -153,7 +153,7 @@
   async function copyInvitationUrl(reservation: any) {
     try {
       const url = `${window.location.origin}/invitation/${reservation.reservationCode}`;
-      copiedCode = `Assalamu'alaikum Warahmatullahi Wabarakatuh 🙏\n\nKepada Yth. *${reservation.guestName}*\n\nDengan hormat, kami mengundang Anda untuk hadir dalam acara *Gathering & Halal Bihalal The Sultan Umroh* yang akan diselenggarakan pada:\n\n📅 *Tanggal:* ${invitation.date}\n📍 *Tempat:* ${invitation.venue}\n🕒 *Waktu:* ${invitation.time}\n\nAcara ini menjadi momen silaturahmi sekaligus mempererat kebersamaan keluarga besar The Sultan Umroh. Kehadiran Anda akan menjadi kehormatan bagi kami.\n\nUntuk konfirmasi kehadiran dan reservasi, silakan kunjungi link berikut:\n🔗 ${url}\n\nTerima kasih atas perhatian dan kehadirannya.\n\nWassalamu'alaikum Warahmatullahi Wabarakatuh ✨`;
+      copiedCode = `Assalamu'alaikum Warahmatullahi Wabarakatuh 🙏\n\nKepada Yth. *${reservation.guestName}*\n\nDengan hormat, kami mengundang Anda untuk hadir dalam acara *Gathering & Halal Bihalal The Sultan Umroh* yang akan diselenggarakan pada:\n\n📅 *Tanggal:* ${invitation.date}\n📍 *Tempat:* ${invitation.venue}\n🕒 *Waktu:* ${invitation.time}\n\n⚠️ Undangan ini berlaku hanya untuk 1 orang.\n\nAcara ini menjadi momen silaturahmi sekaligus mempererat kebersamaan keluarga besar The Sultan Umroh. Kehadiran Anda akan menjadi kehormatan bagi kami.\n\nUntuk konfirmasi kehadiran dan reservasi, silakan kunjungi link berikut:\n🔗 ${url}\n\nTerima kasih atas perhatian dan kehadirannya.\n\nWassalamu'alaikum Warahmatullahi Wabarakatuh ✨`;
       await navigator.clipboard.writeText(copiedCode);
       // copiedCode = reservationCode;
       message = { type: "success", text: "Invitation URL copied!" };
@@ -178,7 +178,7 @@
       .replace(/\+/g, "")
       .replace(/[^0-9]/g, "");
 
-    const messageText = `Assalamu'alaikum Warahmatullahi Wabarakatuh 🙏\n\nKepada Yth. *${reservation.guestName}*\n\nDengan hormat, kami mengundang Anda untuk hadir dalam acara *Gathering & Halal Bihalal The Sultan Umroh* yang akan diselenggarakan pada:\n\n📅 *Tanggal:* ${invitation.date}\n📍 *Tempat:* ${invitation.venue}\n🕒 *Waktu:* ${invitation.time}\n\nAcara ini menjadi momen silaturahmi sekaligus mempererat kebersamaan keluarga besar The Sultan Umroh. Kehadiran Anda akan menjadi kehormatan bagi kami.\n\nUntuk konfirmasi kehadiran dan reservasi, silakan kunjungi link berikut:\n🔗 ${invitationUrl}\n\nTerima kasih atas perhatian dan kehadirannya.\n\nWassalamu'alaikum Warahmatullahi Wabarakatuh ✨`;
+    const messageText = `Assalamu'alaikum Warahmatullahi Wabarakatuh 🙏\n\nKepada Yth. *${reservation.guestName}*\n\nDengan hormat, kami mengundang Anda untuk hadir dalam acara *Gathering & Halal Bihalal The Sultan Umroh* yang akan diselenggarakan pada:\n\n📅 *Tanggal:* ${invitation.date}\n📍 *Tempat:* ${invitation.venue}\n🕒 *Waktu:* ${invitation.time}\n\n⚠️ Undangan ini berlaku hanya untuk 1 orang.\n\nAcara ini menjadi momen silaturahmi sekaligus mempererat kebersamaan keluarga besar The Sultan Umroh. Kehadiran Anda akan menjadi kehormatan bagi kami.\n\nUntuk konfirmasi kehadiran dan reservasi, silakan kunjungi link berikut:\n🔗 ${invitationUrl}\n\nTerima kasih atas perhatian dan kehadirannya.\n\nWassalamu'alaikum Warahmatullahi Wabarakatuh ✨`;
 
     const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(messageText)}`;
     window.open(whatsappUrl, "_blank");

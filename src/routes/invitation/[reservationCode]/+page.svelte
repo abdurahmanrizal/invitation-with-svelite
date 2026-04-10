@@ -157,45 +157,26 @@
   </div>
 {:else}
   <div
-    class="page-wrapper min-h-screen flex items-center justify-center py-8 sm:px-6 lg:px-8 before-overlay"
+    class="page-wrapper min-h-screen flex flex-col items-center justify-center py-8 sm:px-6 lg:px-8 before-overlay"
   >
-    <div class="mx-auto max-w-md sm:max-w-xl lg:max-w-6xl w-full">
-      <div
-        class="mb-8 flex flex-wrap flex-col items-center justify-center gap-3 w-full mt-10"
-        in:fly={{ y: -20, duration: 600, easing: quintOut }}
-      >
-        <div
-          class="flex justify-center mb-3 -mt-5 gap-2 text-amber-200 hover:text-amber-100 ms-5"
-        >
-          <img
-            src="https://thesultanumroh.co.id/logo.png"
-            alt="The Sultan Umrah - Travel Umrah &amp; Haji Terpercaya"
-            class="h-14 md:h-14 w-auto"
-            width="auto"
-            height="56"
-          />
-        </div>
-        <div class="flex justify-center flex-col ms-5">
-          <h1
-            class="mt-4 text-2xl md:text-3xl font-semibold tracking-tight text-gold text-center"
-            in:fly={{ y: 20, duration: 600, delay: 200, easing: quintOut }}
-          >
-            Assalamu'alaikum
-          </h1>
-          <h1
-            class="text-2xl md:text-3xl font-semibold tracking-tight text-gold text-center"
-            in:fly={{ y: 20, duration: 600, delay: 200, easing: quintOut }}
-          >
-            Bpk/Ibu: {reservation.guestName}
-          </h1>
-        </div>
-      </div>
-
-      <div class="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+    <div
+      class="relative mx-auto max-w-md sm:max-w-xl lg:max-w-6xl w-full flex flex-col gap-3 mt-10"
+      in:fly={{ y: -20, duration: 600, easing: quintOut }}
+    >
+      <div class="grid gap-6 lg:grid-cols-1">
         <div in:fly={{ x: -30, duration: 700, delay: 400, easing: quintOut }}>
           <!-- Message Alert -->
 
           <div class="p-3">
+            <div class="flex justify-center">
+              <img
+                src="https://thesultanumroh.co.id/logo.png"
+                alt="The Sultan Umrah - Travel Umrah &amp; Haji Terpercaya"
+                class="h-14 w-auto"
+                width="auto"
+                height="56"
+              />
+            </div>
             <Card className="space-y-6 ">
               {#if message.text}
                 <div
@@ -216,9 +197,9 @@
               <div class="flex items-start justify-between gap-4">
                 <div>
                   <p
-                    class="text-sm uppercase tracking-[0.24em] text-gold-light"
+                    class="text-sm uppercase tracking-[0.24em] text-gold-light font-semibold"
                   >
-                    Reservation Holder
+                    Konfirmasi Kehadiran
                   </p>
                   <h2
                     class="mt-3 text-2xl font-semibold text-gold whitespace-nowrap"
@@ -290,12 +271,16 @@
                   <div class="flex items-center gap-3 text-gold-light">
                     <CalendarDays size={18} class="text-gold" />
                     <span
-                      class="text-sm uppercase tracking-[0.2em] text-gold-light"
-                      >Schedule</span
+                      class="text-xl md:text-2xl uppercase tracking-[0.2em] text-gold-light font-semibold"
+                      >Tanggal</span
                     >
                   </div>
-                  <p class="mt-3 font-medium text-gold">{invitation.date}</p>
-                  <p class="text-gold-light">{invitation.time}</p>
+                  <p class="mt-3 font-medium text-gold text-xl md:text-2xl">
+                    {invitation.date}
+                  </p>
+                  <p class="text-gold-light text-xl md:text-2xl">
+                    {invitation.time}
+                  </p>
                 </div>
 
                 <a
@@ -308,12 +293,16 @@
                   <div class="flex items-center gap-3 text-gold-light">
                     <MapPin size={18} class="text-gold" />
                     <span
-                      class="text-sm uppercase tracking-[0.2em] text-gold-light"
-                      >Venue</span
+                      class="text-xl md:text-2xl uppercase tracking-[0.2em] text-gold-light font-semibold"
+                      >Tempat</span
                     >
                   </div>
-                  <p class="mt-3 font-medium text-gold">{invitation.venue}</p>
-                  <p class="text-gold-light">{invitation.address}</p>
+                  <p class="mt-3 font-medium text-gold text-xl md:text-2xl">
+                    {invitation.venue}
+                  </p>
+                  <p class="text-gold-light text-xl md:text-2xl">
+                    {invitation.address}
+                  </p>
                 </a>
 
                 <a
@@ -323,8 +312,10 @@
                   class="flex items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm font-medium transition-opacity hover:opacity-80"
                   style="border-color: rgba(171, 135, 19, 0.3); background: rgba(171, 135, 19, 0.2);"
                 >
-                  <MapPin size={16} class="fill-[#AB8713]" />
-                  <span class="text-gold">Open in Maps</span>
+                  <MapPin size={28} class="fill-[#AB8713]" />
+                  <span class="text-gold text-xl md:text-2xl font-semibold"
+                    >Buka di Maps</span
+                  >
                 </a>
               </div>
             </Card>
@@ -339,8 +330,10 @@
             className="flex flex-col items-center justify-center gap-6 text-center"
           >
             <div>
-              <p class="text-sm uppercase tracking-[0.24em] text-gold-light">
-                Entry QR Code
+              <p
+                class="text-sm uppercase tracking-[0.24em] text-gold-light font-bold"
+              >
+                QR Code Wajib Ditunjukan Saat Hadir
               </p>
             </div>
 

@@ -3,7 +3,7 @@ export const invitation = {
   subtitle:
     "A serene evening of silaturahmi, reflection, and preparation for the blessed journey.",
   date: "Minggu, 12 April 2026",
-  time: "08:00 - Selesai WIB",
+  time: "09:00 - Selesai WIB",
   venue: "Muria Ballroom Novotel",
   address:
     "Jl. Pemuda No.123, Sekayu, Kec. Semarang Tengah, Kota Semarang, Jawa Tengah 50132",

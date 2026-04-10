@@ -1,7 +1,6 @@
 <script lang="ts">
-  import {
-    PUBLIC_PHP_API_URL
-  } from '$env/static/public';
+  import { PUBLIC_PHP_API_URL } from "$env/static/public";
+  import { invitation } from "$lib/data";
   import {
     Plus,
     Trash2,
@@ -15,6 +14,7 @@
     Calendar,
     Copy,
     Search,
+    MessageCircle,
   } from "lucide-svelte";
   import Card from "$lib/components/ui/card.svelte";
   import Button from "$lib/components/ui/button.svelte";
@@ -33,8 +33,10 @@
     ? reservations.filter(
         (r) =>
           r.guestName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          r.reservationCode?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          r.phone?.includes(searchQuery)
+          r.reservationCode
+            ?.toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          r.phone?.includes(searchQuery),
       )
     : reservations;
 
@@ -148,11 +150,12 @@
     message = { type: "", text: "" };
   }
 
-  async function copyInvitationUrl(reservationCode: string) {
-    const url = `${window.location.origin}/invitation/${reservationCode}`;
+  async function copyInvitationUrl(reservation: any) {
     try {
-      await navigator.clipboard.writeText(url);
-      copiedCode = reservationCode;
+      const url = `${window.location.origin}/invitation/${reservation.reservationCode}`;
+      copiedCode = `Assalamu'alaikum Warahmatullahi Wabarakatuh 🙏\n\nKepada Yth. *${reservation.guestName}*\n\nDengan hormat, kami mengundang Anda untuk hadir dalam acara *Gathering & Halal Bihalal The Sultan Umroh* yang akan diselenggarakan pada:\n\n📅 *Tanggal:* ${invitation.date}\n📍 *Tempat:* ${invitation.venue}\n🕒 *Waktu:* ${invitation.time}\n\nAcara ini menjadi momen silaturahmi sekaligus mempererat kebersamaan keluarga besar The Sultan Umroh. Kehadiran Anda akan menjadi kehormatan bagi kami.\n\nUntuk konfirmasi kehadiran dan reservasi, silakan kunjungi link berikut:\n🔗 ${url}\n\nTerima kasih atas perhatian dan kehadirannya.\n\nWassalamu'alaikum Warahmatullahi Wabarakatuh ✨`;
+      await navigator.clipboard.writeText(copiedCode);
+      // copiedCode = reservationCode;
       message = { type: "success", text: "Invitation URL copied!" };
       setTimeout(() => {
         copiedCode = null;
@@ -161,6 +164,24 @@
     } catch (error) {
       message = { type: "error", text: "Failed to copy URL" };
     }
+  }
+
+  function sendWhatsApp(reservation: any) {
+    if (!reservation.phone) {
+      message = { type: "error", text: "No phone number for this reservation" };
+      return;
+    }
+
+    const invitationUrl = `${window.location.origin}/invitation/${reservation.reservationCode}`;
+    const formattedPhone = reservation.phone
+      .replace(/^0/, "62")
+      .replace(/\+/g, "")
+      .replace(/[^0-9]/g, "");
+
+    const messageText = `Assalamu'alaikum Warahmatullahi Wabarakatuh 🙏\n\nKepada Yth. *${reservation.guestName}*\n\nDengan hormat, kami mengundang Anda untuk hadir dalam acara *Gathering & Halal Bihalal The Sultan Umroh* yang akan diselenggarakan pada:\n\n📅 *Tanggal:* ${invitation.date}\n📍 *Tempat:* ${invitation.venue}\n🕒 *Waktu:* ${invitation.time}\n\nAcara ini menjadi momen silaturahmi sekaligus mempererat kebersamaan keluarga besar The Sultan Umroh. Kehadiran Anda akan menjadi kehormatan bagi kami.\n\nUntuk konfirmasi kehadiran dan reservasi, silakan kunjungi link berikut:\n🔗 ${invitationUrl}\n\nTerima kasih atas perhatian dan kehadirannya.\n\nWassalamu'alaikum Warahmatullahi Wabarakatuh ✨`;
+
+    const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(messageText)}`;
+    window.open(whatsappUrl, "_blank");
   }
 
   loadReservations();
@@ -178,12 +199,12 @@
       <div>
         <Badge variant="outline">Admin Panel</Badge>
         <h1 class="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
-          Reservations Management
+          Manajemen Reservasi
         </h1>
       </div>
       <Button on:click={() => (showForm = true)} className="gap-2">
         <Plus size={18} />
-        Add Reservation
+        Tambah Reservasi
       </Button>
     </div>
 
@@ -310,10 +331,15 @@
         class="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4"
       >
         <h2 class="text-xl font-semibold">
-          All Reservations {searchQuery ? `(${filteredReservations.length} of ${reservations.length})` : `(${reservations.length})`}
+          All Reservations {searchQuery
+            ? `(${filteredReservations.length} of ${reservations.length})`
+            : `(${reservations.length})`}
         </h2>
         <div class="relative">
-          <Search size={16} class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search
+            size={16}
+            class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+          />
           <input
             type="text"
             bind:value={searchQuery}
@@ -329,7 +355,11 @@
         </div>
       {:else if filteredReservations.length === 0}
         <div class="py-12 text-center text-slate-400">
-          <p>{searchQuery ? "No reservations found matching your search." : "No reservations yet. Create your first one!"}</p>
+          <p>
+            {searchQuery
+              ? "No reservations found matching your search."
+              : "No reservations yet. Create your first one!"}
+          </p>
         </div>
       {:else}
         <div class="overflow-x-auto">
@@ -338,9 +368,9 @@
               <tr
                 class="border-b border-white/10 text-left text-sm text-slate-400"
               >
-                <th class="pb-4 font-medium">Code</th>
-                <th class="pb-4 font-medium">Guest Name</th>
-                <th class="pb-4 font-medium">Contact</th>
+                <th class="pb-4 font-medium">Kode</th>
+                <th class="pb-4 font-medium">Tamu</th>
+                <th class="pb-4 font-medium">Kontak</th>
                 <th class="pb-4 font-medium">Status</th>
                 <th class="pb-4 font-medium">Actions</th>
               </tr>
@@ -372,7 +402,14 @@
                   <td class="py-4">
                     <div class="flex gap-2">
                       <button
-                        onclick={() => copyInvitationUrl(reservation.reservationCode)}
+                        onclick={() => sendWhatsApp(reservation)}
+                        class="rounded-lg p-2 hover:bg-green-400/10 transition-colors"
+                        title="Send via WhatsApp"
+                      >
+                        <MessageCircle size={16} class="text-green-400" />
+                      </button>
+                      <button
+                        onclick={() => copyInvitationUrl(reservation)}
                         class="rounded-lg p-2 hover:bg-amber-400/10 transition-colors"
                         title="Copy Invitation URL"
                       >

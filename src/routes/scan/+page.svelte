@@ -28,14 +28,10 @@
   onMount(async () => {
     await tick(); // Ensure videoElement is bound before creating scanner
     try {
-      qrScanner = new QrScanner(
-        videoElement,
-        handleQrResult,
-        {
-          highlightScanRegion: true,
-          highlightCodeOutline: true,
-        },
-      );
+      qrScanner = new QrScanner(videoElement, handleQrResult, {
+        highlightScanRegion: true,
+        highlightCodeOutline: true,
+      });
 
       await startScanner();
     } catch (error) {
@@ -109,14 +105,10 @@
       await tick();
       if (!videoElement) return;
 
-      qrScanner = new QrScanner(
-        videoElement,
-        handleQrResult,
-        {
-          highlightScanRegion: true,
-          highlightCodeOutline: true,
-        },
-      );
+      qrScanner = new QrScanner(videoElement, handleQrResult, {
+        highlightScanRegion: true,
+        highlightCodeOutline: true,
+      });
 
       await qrScanner.start();
       isCameraActive = true;
@@ -184,21 +176,36 @@
   <meta name="description" content="Scan QR codes for guest check-in" />
 </svelte:head>
 
-<div class="min-h-screen bg-slate-950 px-4 py-8 text-white sm:px-6 lg:px-8">
+<div class="page-wrapper min-h-screen px-4 py-8 text-white sm:px-6 lg:px-8">
   <div class="mx-auto max-w-2xl">
     <!-- Header -->
     <div class="mb-8 text-center">
-      <Badge>Check-in Scanner</Badge>
-      <h1 class="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
+      <div
+        class="flex justify-center mb-3 mt-5 ms-4 gap-2 text-amber-200 hover:text-amber-100"
+      >
+        <!-- <span class="font-semibold">🕋 Umrah Gathering</span> -->
+        <img
+          src="https://thesultanumroh.co.id/logo.png"
+          alt="The Sultan Umrah - Travel Umrah &amp; Haji Terpercaya"
+          class=" h-14 md:h-14 w-50 object-contain"
+          width="auto"
+          height="56"
+        />
+      </div>
+      <!-- <h1
+        class="mt-4 text-gold ms-4 text-3xl font-semibold tracking-tight sm:text-4xl"
+      >
         Scan Guest QR Code
       </h1>
-      <p class="mt-3 text-slate-300">
+      <p class="mt-3 ms-4 text-gold">
         Point the camera at the guest's invitation QR code to check them in
-      </p>
+      </p> -->
     </div>
 
     <!-- Scanner Card -->
-    <Card className="overflow-hidden">
+    <Card
+      className="overflow-hidden shadow-xl bg-[#e5c579] shadow-amber-950/40"
+    >
       {#if scanResult === "scanning"}
         <!-- Camera View -->
         <div class="relative aspect-square bg-black">
@@ -249,14 +256,14 @@
         <!-- Instructions -->
         <div class="p-6">
           <div
-            class="rounded-2xl border border-amber-400/20 bg-amber-400/10 p-4 text-sm leading-6 text-amber-100"
+            class="rounded-2xl border border-amber-400/20 bg-slate-800 p-4 text-sm leading-6 text-amber-100"
           >
-            <p class="font-medium mb-2">Scanning Tips:</p>
+            <p class="font-medium mb-2">Tips Pemindaian:</p>
             <ul class="list-disc list-inside space-y-1 text-amber-200/80">
-              <li>Hold the device steady</li>
-              <li>Ensure good lighting</li>
-              <li>Position QR code within the frame</li>
-              <li>Keep 10-20cm distance from the code</li>
+              <li>Tahan perangkat dengan stabil</li>
+              <li>Pastikan pencahayaan cukup</li>
+              <li>Posisikan kode QR dalam bingkai</li>
+              <li>Jaga jarak 10-20cm dari kode</li>
             </ul>
           </div>
         </div>
@@ -397,3 +404,32 @@
     </Card>
   </div>
 </div>
+
+<style>
+  .page-wrapper::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("/bg-small.webp");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -2;
+    image-rendering: -webkit-optimize-contrast;
+  }
+
+  @media (min-width: 640px) {
+    .page-wrapper::before {
+      background-image: url("/bg-medium.webp");
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .page-wrapper::before {
+      background-image: url("/bg-large.webp");
+    }
+  }
+</style>

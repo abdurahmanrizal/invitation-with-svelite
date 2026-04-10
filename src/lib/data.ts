@@ -1,58 +1,65 @@
 export const invitation = {
-  title: 'Umrah Gathering 1447 H',
-  subtitle: 'A serene evening of silaturahmi, reflection, and preparation for the blessed journey.',
-  date: 'Saturday, 18 October 2026',
-  time: '18:30 - 21:30 WIB',
-  venue: 'Grand Ballroom Al-Safa, Jakarta',
-  address: 'Jl. KH. Mas Mansyur No. 88, Jakarta Pusat',
-  mapUrl: 'https://maps.google.com',
-  ctaLabel: 'Confirm Attendance',
-  ctaUrl: '#rsvp',
-  host: 'Hosted by Family & Friends of Baitullah'
+  title: "Umrah Gathering 1447 H",
+  subtitle:
+    "A serene evening of silaturahmi, reflection, and preparation for the blessed journey.",
+  date: "Minggu, 12 April 2026",
+  time: "08:00 - Selesai WIB",
+  venue: "Muria Ballroom Novotel",
+  address:
+    "Jl. Pemuda No.123, Sekayu, Kec. Semarang Tengah, Kota Semarang, Jawa Tengah 50132",
+  mapUrl: "https://maps.app.goo.gl/GpVPY1BFRNiCWZTw8",
+  ctaLabel: "Confirm Attendance",
+  ctaUrl: "#rsvp",
+  host: "Hosted by Family & Friends of Baitullah",
 };
 
 export const highlights = [
   {
-    title: 'Majelis Tausiyah',
-    description: 'Short spiritual reminder on the adab of travelling to the holy land.'
+    title: "Majelis Tausiyah",
+    description:
+      "Short spiritual reminder on the adab of travelling to the holy land.",
   },
   {
-    title: 'Doa Bersama',
-    description: 'Collective prayer for a smooth, safe, and blessed Umrah journey.'
+    title: "Doa Bersama",
+    description:
+      "Collective prayer for a smooth, safe, and blessed Umrah journey.",
   },
   {
-    title: 'Dinner & Fellowship',
-    description: 'Warm dinner session to meet fellow pilgrims and families.'
-  }
+    title: "Dinner & Fellowship",
+    description: "Warm dinner session to meet fellow pilgrims and families.",
+  },
 ];
 
 export const agenda = [
-  { time: '18:30', title: 'Guest Arrival & Registration' },
-  { time: '19:00', title: 'Opening, Tilawah & Welcome Speech' },
-  { time: '19:25', title: 'Tausiyah: Preparing the Heart for Umrah' },
-  { time: '20:00', title: 'Doa Bersama & Group Photo' },
-  { time: '20:20', title: 'Dinner Gathering' },
-  { time: '21:15', title: 'Closing & Souvenir Distribution' }
+  { time: "18:30", title: "Guest Arrival & Registration" },
+  { time: "19:00", title: "Opening, Tilawah & Welcome Speech" },
+  { time: "19:25", title: "Tausiyah: Preparing the Heart for Umrah" },
+  { time: "20:00", title: "Doa Bersama & Group Photo" },
+  { time: "20:20", title: "Dinner Gathering" },
+  { time: "21:15", title: "Closing & Souvenir Distribution" },
 ];
 
 export const essentials = [
-  'Modest attire in white, cream, or earth tones',
-  'Bring your personalized invitation QR or digital confirmation',
-  'Please arrive 15 minutes before the program starts',
-  'Families and close companions are warmly welcome'
+  "Modest attire in white, cream, or earth tones",
+  "Bring your personalized invitation QR or digital confirmation",
+  "Please arrive 15 minutes before the program starts",
+  "Families and close companions are warmly welcome",
 ];
 
 export const gallery = [
   {
-    title: 'Elegant venue setup',
-    description: 'Soft gold accents, warm candlelight ambiance, and a welcoming registration table.'
+    title: "Elegant venue setup",
+    description:
+      "Soft gold accents, warm candlelight ambiance, and a welcoming registration table.",
   },
   {
-    title: 'Meaningful companionship',
-    description: 'A beautiful evening for reconnecting before the sacred journey begins.'
+    title: "Meaningful companionship",
+    description:
+      "A beautiful evening for reconnecting before the sacred journey begins.",
   },
   {
-    title: 'Reflective moments',
-    description: 'A calm environment designed for prayer, gratitude, and sharing.'
-  }
+    title: "Reflective moments",
+    description:
+      "A calm environment designed for prayer, gratitude, and sharing.",
+  },
 ];

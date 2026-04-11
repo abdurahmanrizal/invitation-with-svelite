@@ -29,7 +29,7 @@ try {
     // Get all reservations
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $result = $conn->query("
-            SELECT id, reservationCode, guestName, seatLabel, allowedGuests, phone, status, checkedInAt
+            SELECT id, reservationCode, guestName, seatLabel, allowedGuests, phone, status, checkedInAt, copyCount
             FROM reservations
             ORDER BY createdAt DESC
         ");
@@ -130,6 +130,29 @@ try {
                 'message' => 'Failed to create reservation'
             ]);
             throw new Exception("Failed to create reservation");
+        }
+        $stmt->close();
+    }
+    // delete new reservation
+    elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        $data = json_decode(file_get_contents('php://input'), true);
+        $reservationId = $data['id'] ?? null;
+        $stmt = $conn->prepare("
+            DELETE FROM reservations
+            WHERE id = ?
+        ");
+        $stmt->bind_param("i", $reservationId);
+        if ($stmt->execute()) {
+            echo json_encode([
+                'success' => true,
+                'message' => 'Reservation deleted successfully'
+            ]);
+        } else {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Failed to delete reservation'
+            ]);
+            throw new Exception("Failed to delete reservation");
         }
         $stmt->close();
     }

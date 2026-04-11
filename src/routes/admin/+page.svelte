@@ -25,40 +25,42 @@
   import Badge from "$lib/components/ui/badge.svelte";
   import clsx from "clsx";
 
-  let reservations: any[] = [];
-  let isLoading = true;
-  let showForm = false;
-  let editingId: number | null = null;
-  let isSaving = false;
-  let message = { type: "", text: "" };
-  let copiedCode: string | null = null;
-  let searchQuery = "";
-  let statusFilter = "all";
-  let currentPage = 1;
+  let reservations = $state<any[]>([]);
+  let isLoading = $state(true);
+  let showForm = $state(false);
+  let editingId = $state<number | null>(null);
+  let isSaving = $state(false);
+  let message = $state({ type: "", text: "" });
+  let copiedCode = $state<string | null>(null);
+  let searchQuery = $state("");
+  let statusFilter = $state("all");
+  let currentPage = $state(1);
   let itemsPerPage = 10;
 
-  $: filteredReservations = reservations.filter((r) => {
-    const matchesSearch = searchQuery
-      ? r.guestName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        r.reservationCode?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        r.phone?.includes(searchQuery)
-      : true;
+  let filteredReservations = $derived(
+    reservations.filter((r) => {
+      const matchesSearch = searchQuery
+        ? r.guestName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          r.reservationCode?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          r.phone?.includes(searchQuery)
+        : true;
 
-    const matchesStatus = statusFilter === "all" || r.status === statusFilter;
+      const matchesStatus = statusFilter === "all" || r.status === statusFilter;
 
-    return matchesSearch && matchesStatus;
-  });
-
-  $: totalPages = Math.ceil(filteredReservations.length / itemsPerPage);
-
-  $: paginatedReservations = filteredReservations.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
+      return matchesSearch && matchesStatus;
+    })
   );
 
-  $: currentPage = Math.min(currentPage, Math.max(1, totalPages || 1));
+  let totalPages = $derived(Math.ceil(filteredReservations.length / itemsPerPage));
 
-  let formData = {
+  let paginatedReservations = $derived(
+    filteredReservations.slice(
+      (currentPage - 1) * itemsPerPage,
+      currentPage * itemsPerPage,
+    )
+  );
+
+  let formData = $state({
     id: null,
     reservationCode: "",
     guestName: "",
@@ -66,7 +68,7 @@
     allowedGuests: null,
     phone: "",
     status: "pending",
-  };
+  });
 
   async function loadReservations() {
     isLoading = true;
@@ -224,6 +226,74 @@
 
     const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(messageText)}`;
     window.open(whatsappUrl, "_blank");
+  }
+
+  async function checkInGuest(reservation: any) {
+    try {
+      const response = await fetch(`${PUBLIC_PHP_API_URL}/reservation-id.php`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: reservation.id,
+          guestName: reservation.guestName,
+          seatLabel: reservation.seatLabel || "",
+          allowedGuests: reservation.allowedGuests,
+          phone: reservation.phone || "",
+          status: "checked_in",
+          checkedInAt: new Date().toISOString(),
+        }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        message = {
+          type: "success",
+          text: `${reservation.guestName} checked in successfully!`,
+        };
+        await loadReservations();
+      } else {
+        message = {
+          type: "error",
+          text: result.message || "Failed to check in",
+        };
+      }
+    } catch (error) {
+      message = { type: "error", text: "Network error" };
+    }
+  }
+
+  async function undoCheckIn(reservation: any) {
+    try {
+      const response = await fetch(`${PUBLIC_PHP_API_URL}/reservation-id.php`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: reservation.id,
+          guestName: reservation.guestName,
+          seatLabel: reservation.seatLabel || "",
+          allowedGuests: reservation.allowedGuests,
+          phone: reservation.phone || "",
+          status: "confirmed",
+          checkedInAt: null,
+        }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        message = {
+          type: "success",
+          text: `Check in undone for ${reservation.guestName}`,
+        };
+        await loadReservations();
+      } else {
+        message = {
+          type: "error",
+          text: result.message || "Failed to undo check in",
+        };
+      }
+    } catch (error) {
+      message = { type: "error", text: "Network error" };
+    }
   }
 
   loadReservations();
@@ -384,7 +454,9 @@
             <select
               bind:value={statusFilter}
               class="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/20"
-              onchange={() => (currentPage = 1)}
+              onchange={() => {
+                currentPage = 1;
+              }}
             >
               <option value="all">All Status</option>
               <option value="pending">Pending</option>
@@ -403,7 +475,9 @@
               bind:value={searchQuery}
               placeholder="Search by name, code, or phone..."
               class="w-64 rounded-xl border border-white/10 bg-white/5 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-slate-500 focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/20"
-              oninput={() => (currentPage = 1)}
+              oninput={() => {
+                currentPage = 1;
+              }}
             />
           </div>
         </div>
@@ -479,6 +553,23 @@
                     </span>
                   {/if}
                 </button>
+                {#if reservation.status !== "checked_in"}
+                  <button
+                    onclick={() => checkInGuest(reservation)}
+                    class="rounded-lg bg-emerald-400/10 p-2.5 transition-colors hover:bg-emerald-400/20"
+                    title="Check In"
+                  >
+                    <Check size={18} class="text-emerald-400" />
+                  </button>
+                {:else}
+                  <button
+                    onclick={() => undoCheckIn(reservation)}
+                    class="rounded-lg bg-orange-400/10 p-2.5 transition-colors hover:bg-orange-400/20"
+                    title="Undo Check In"
+                  >
+                    <X size={18} class="text-orange-400" />
+                  </button>
+                {/if}
                 <button
                   onclick={() => editReservation(reservation)}
                   class="rounded-lg bg-white/10 p-2.5 transition-colors hover:bg-white/20"
@@ -569,6 +660,23 @@
                           </span>
                         {/if}
                       </button>
+                      {#if reservation.status !== "checked_in"}
+                        <button
+                          onclick={() => checkInGuest(reservation)}
+                          class="rounded-lg p-2 hover:bg-emerald-400/10 transition-colors"
+                          title="Check In"
+                        >
+                          <Check size={16} class="text-emerald-400" />
+                        </button>
+                      {:else}
+                        <button
+                          onclick={() => undoCheckIn(reservation)}
+                          class="rounded-lg p-2 hover:bg-orange-400/10 transition-colors"
+                          title="Undo Check In"
+                        >
+                          <X size={16} class="text-orange-400" />
+                        </button>
+                      {/if}
                       <button
                         onclick={() => editReservation(reservation)}
                         class="rounded-lg p-2 hover:bg-white/10 transition-colors"

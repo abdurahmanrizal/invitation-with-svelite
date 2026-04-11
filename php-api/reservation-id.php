@@ -46,18 +46,29 @@ try {
         }
         // echo json_encode($data);
         // exit;
+
+        // Handle checkedInAt - properly set to NULL if needed
+        $checkedInAt = null;
+        if (isset($data['checkedInAt']) && $data['checkedInAt'] !== null && $data['checkedInAt'] !== '') {
+            $checkedInAt = $data['checkedInAt'];
+        }
+
         $stmt = $conn->prepare("
             UPDATE reservations
-            SET guestName = ?, seatLabel = ?, allowedGuests = ?, phone = ?, status = ?
+            SET guestName = ?, seatLabel = ?, allowedGuests = ?, phone = ?, status = ?, checkedInAt = ?
             WHERE id = ?
         ");
+
+        // Type: s=string, i=integer
+        // guestName(s), seatLabel(s), allowedGuests(i), phone(s), status(s), checkedInAt(s/null), id(i)
         $stmt->bind_param(
-            "ssssss",
+            "ssisssi",
             $data['guestName'],
             $data['seatLabel'],
             $data['allowedGuests'],
             $data['phone'],
             $data['status'],
+            $checkedInAt,
             $reservationId
         );
 

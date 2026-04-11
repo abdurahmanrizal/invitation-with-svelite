@@ -64,7 +64,7 @@
       }
 
       const { reservationCode, checkInUrl } = parsedData;
-      console.info(checkInUrl);
+
       // Fetch reservation details from PHP API
       const response = await fetch(
         `${PUBLIC_PHP_API_URL}/reservation.php?code=${reservationCode}`,
@@ -77,7 +77,6 @@
         stopScanner();
         return;
       }
-
       scanResult = "success";
       resultData = { ...data, checkInUrl };
       isCheckedIn = data.status === "checked_in" ? true : false;

@@ -4,10 +4,10 @@ export const invitation = {
     "A serene evening of silaturahmi, reflection, and preparation for the blessed journey.",
   date: "Minggu, 12 April 2026",
   time: "09:00 - Selesai WIB",
-  venue: "Muria Ballroom Novotel",
+  venue: "Musi Ballroom - Lantai 3 Hotel Aruss Semarang",
   address:
-    "Jl. Pemuda No.123, Sekayu, Kec. Semarang Tengah, Kota Semarang, Jawa Tengah 50132",
-  mapUrl: "https://maps.app.goo.gl/GpVPY1BFRNiCWZTw8",
+    "Jl. Dr. Wahidin No.116, Jatingaleh, Kec. Candisari, Kota Semarang, Jawa Tengah 50254",
+  mapUrl: "https://maps.app.goo.gl/k3DDKbuyGucagH6h9",
   ctaLabel: "Confirm Attendance",
   ctaUrl: "#rsvp",
   host: "Hosted by Family & Friends of Baitullah",

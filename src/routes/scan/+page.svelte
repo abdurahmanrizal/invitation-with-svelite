@@ -13,6 +13,7 @@
   import Card from "$lib/components/ui/card.svelte";
   import Button from "$lib/components/ui/button.svelte";
   import Badge from "$lib/components/ui/badge.svelte";
+  import clsx from "clsx";
 
   let videoElement: HTMLVideoElement;
   let qrScanner: QrScanner | null = null;
@@ -204,7 +205,13 @@
 
     <!-- Scanner Card -->
     <Card
-      className="overflow-hidden shadow-xl bg-[#e5c579] shadow-amber-950/40"
+      // className="overflow-hidden shadow-xl bg-[#e5c579] shadow-amber-950/40"
+      className={clsx(
+        "overflow-hidden shadow-xl bg-[#e5c579] shadow-amber-950/40",
+        {
+          "bg-slate-950": scanResult === "success",
+        },
+      )}
     >
       {#if scanResult === "scanning"}
         <!-- Camera View -->

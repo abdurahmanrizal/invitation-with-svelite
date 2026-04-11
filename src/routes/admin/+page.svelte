@@ -239,7 +239,7 @@
     <!-- Header -->
     <div class="mb-8 flex flex-wrap items-center justify-between gap-4">
       <div>
-        <Badge variant="outline">Admin Panel</Badge>
+        <Badge>Admin Panel</Badge>
         <h1 class="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
           Manajemen Reservasi
         </h1>
@@ -472,7 +472,9 @@
                       : "text-slate-400"}
                   />
                   {#if reservation.copyCount > 0}
-                    <span class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-amber-400 text-[10px] font-bold text-slate-950">
+                    <span
+                      class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-amber-400 text-[10px] font-bold text-slate-950"
+                    >
                       {reservation.copyCount}
                     </span>
                   {/if}
@@ -560,7 +562,9 @@
                             : "text-slate-400"}
                         />
                         {#if reservation.copyCount > 0}
-                          <span class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-amber-400 text-[10px] font-bold text-slate-950">
+                          <span
+                            class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-amber-400 text-[10px] font-bold text-slate-950"
+                          >
                             {reservation.copyCount}
                           </span>
                         {/if}

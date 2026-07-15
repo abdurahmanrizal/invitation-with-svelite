@@ -29,7 +29,7 @@ try {
     // Get all reservations
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $result = $conn->query("
-            SELECT id, reservationCode, guestName, seatLabel, allowedGuests, phone, status, checkedInAt, copyCount
+            SELECT id, reservationCode, guestName, seatLabel, allowedGuests, phone, status, category, checkedInAt, copyCount
             FROM reservations
             ORDER BY createdAt DESC
         ");
@@ -101,20 +101,24 @@ try {
         if (!isset($data['allowedGuests'])) $data['allowedGuests'] = 1;
         if (!isset($data['phone'])) $data['phone'] = null;
         if (!isset($data['status'])) $data['status'] = 'pending';
+        if (!isset($data['category']) || !in_array($data['category'], ['mitra', 'jamaah'], true)) {
+            $data['category'] = 'jamaah';
+        }
 
         // Insert new reservation
         $stmt = $conn->prepare("
-            INSERT INTO reservations (reservationCode, guestName, seatLabel, allowedGuests, phone, status)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO reservations (reservationCode, guestName, seatLabel, allowedGuests, phone, status, category)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         ");
         $stmt->bind_param(
-            "sssiss",
+            "sssisss",
             $data['reservationCode'],
             $data['guestName'],
             $data['seatLabel'],
             $data['allowedGuests'],
             $data['phone'],
-            $data['status']
+            $data['status'],
+            $data['category']
         );
 
         if ($stmt->execute()) {

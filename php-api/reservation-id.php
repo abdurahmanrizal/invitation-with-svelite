@@ -50,24 +50,32 @@ try {
         // Handle checkedInAt - properly set to NULL if needed
         $checkedInAt = null;
         if (isset($data['checkedInAt']) && $data['checkedInAt'] !== null && $data['checkedInAt'] !== '') {
-            $checkedInAt = $data['checkedInAt'];
+            // $checkedInAt = $data['checkedInAt'];
+            $checkedInAt = date('Y-m-d, H:i:s', strtotime($data['checkedInAt']));
+        }
+
+        // Preserve the existing category for older clients that do not send it.
+        $category = $data['category'] ?? null;
+        if ($category !== null && !in_array($category, ['mitra', 'jamaah'], true)) {
+            $category = null;
         }
 
         $stmt = $conn->prepare("
             UPDATE reservations
-            SET guestName = ?, seatLabel = ?, allowedGuests = ?, phone = ?, status = ?, checkedInAt = ?
+            SET guestName = ?, seatLabel = ?, allowedGuests = ?, phone = ?, status = ?, category = COALESCE(?, category), checkedInAt = ?
             WHERE id = ?
         ");
 
         // Type: s=string, i=integer
         // guestName(s), seatLabel(s), allowedGuests(i), phone(s), status(s), checkedInAt(s/null), id(i)
         $stmt->bind_param(
-            "ssisssi",
+            "ssissssi",
             $data['guestName'],
             $data['seatLabel'],
             $data['allowedGuests'],
             $data['phone'],
             $data['status'],
+            $category,
             $checkedInAt,
             $reservationId
         );

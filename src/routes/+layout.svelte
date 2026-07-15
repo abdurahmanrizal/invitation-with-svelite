@@ -2,6 +2,7 @@
   import "../app.css";
   import { Home, ScanLine, Settings } from "lucide-svelte";
   import { page } from "$app/stores";
+  import ThemeToggle from "$lib/components/theme-toggle.svelte";
 
   let currentPage = "";
 
@@ -60,4 +61,5 @@
   </nav>
 {/if}
 
+<ThemeToggle />
 <slot />

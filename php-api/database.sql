@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS `reservations` (
   `allowedGuests` int(11) NOT NULL DEFAULT 1,
   `phone` varchar(50) DEFAULT NULL,
   `status` enum('confirmed','pending','checked_in') NOT NULL DEFAULT 'pending',
+  `category` enum('mitra','jamaah') NOT NULL DEFAULT 'jamaah',
   `checkedInAt` datetime DEFAULT NULL,
   `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),

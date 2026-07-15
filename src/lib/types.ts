@@ -5,5 +5,6 @@ export type GuestReservation = {
   allowedGuests: number;
   phone: string;
   status: 'confirmed' | 'pending' | 'checked_in';
+  category?: 'mitra' | 'jamaah';
   checkedInAt?: string;
 };

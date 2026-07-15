@@ -1,10 +1,23 @@
 <!doctype html>
-<html lang="en">
+<html lang="id">
   <head>
     <meta charset="utf-8" />
     <!-- <link rel="icon" href="%sveltekit.assets%/favicon.svg" /> -->
     <link rel="icon"  href="https://thesultanumroh.co.id/logo.png">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      (() => {
+        let savedTheme = null;
+        try {
+          savedTheme = localStorage.getItem('theme');
+        } catch {}
+        const theme = savedTheme === 'light' || savedTheme === 'dark'
+          ? savedTheme
+          : (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+      })();
+    </script>
     %sveltekit.head%
   </head>
   <body data-sveltekit-preload-data="hover">

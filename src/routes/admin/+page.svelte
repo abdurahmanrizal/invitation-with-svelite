@@ -28,6 +28,34 @@
     import ImportReservations from "$lib/components/admin/import-reservations.svelte";
     import clsx from "clsx";
 
+    const invitationEmoji = {
+        prayer: String.fromCodePoint(0x1f64f),
+        calendar: String.fromCodePoint(0x1f4c5),
+        location: String.fromCodePoint(0x1f4cd),
+        clock: String.fromCodePoint(0x1f552),
+        warning: String.fromCodePoint(0x26a0, 0xfe0f),
+        link: String.fromCodePoint(0x1f517),
+        sparkle: String.fromCodePoint(0x2728),
+    };
+
+    function createWhatsAppUrl(phone: string, text: string) {
+        const replacementCharacter = String.fromCodePoint(0xfffd);
+        const sanitizedText = text
+            .normalize("NFC")
+            .replaceAll(replacementCharacter, "");
+        const params = new URLSearchParams({
+            phone,
+            text: sanitizedText,
+        });
+        const url = `https://api.whatsapp.com/send?${params.toString()}`;
+
+        if (url.toUpperCase().includes("%EF%BF%BD")) {
+            throw new Error("WhatsApp message contains invalid UTF-8 text");
+        }
+
+        return url;
+    }
+
     let reservations = $state<any[]>([]);
     let isLoading = $state(true);
     let showForm = $state(false);
@@ -235,7 +263,7 @@
             const agendaDescription = isManasik
                 ? "Kegiatan manasik ini diselenggarakan sebagai pembekalan agar Bapak/Ibu dapat memahami rangkaian ibadah umroh, tata cara pelaksanaannya, serta berbagai persiapan yang diperlukan. Mengingat pentingnya materi yang akan disampaikan, kami sangat mengharapkan kehadiran Bapak/Ibu."
                 : "Acara ini menjadi momen silaturahmi sekaligus mempererat kebersamaan keluarga besar The Sultan Umroh. Kehadiran Bapak/Ibu akan menjadi kehormatan dan kebahagiaan bagi kami.";
-            const confirmationText = `\n\nUntuk melakukan konfirmasi kehadiran, silakan mengunjungi tautan berikut:\n🔗 ${url}`;
+            const confirmationText = `\n\nUntuk melakukan konfirmasi kehadiran, silakan mengunjungi tautan berikut:\n${invitationEmoji.link} ${url}`;
             const invitationDate = isManasik
                 ? invitationManasik.date
                 : invitation.date;
@@ -245,7 +273,7 @@
             const invitationTime = isManasik
                 ? invitationManasik.time
                 : invitation.time;
-            copiedCode = `Assalamu'alaikum Warahmatullahi Wabarakatuh 🙏\n\nKepada Yth.\n*Bapak/Ibu ${reservation.guestName}*\n\nDengan hormat, kami mengundang Bapak/Ibu untuk menghadiri acara ${agendaLabel} yang insyaallah akan diselenggarakan pada:\n\n📅 *Tanggal:* ${invitationDate}\n📍 *Tempat:* ${invitationVenue}\n🕒 *Waktu:* ${invitationTime}\n\n⚠️ Undangan ini berlaku untuk 1 orang.\n\n${agendaDescription}${confirmationText}\n\nAtas perhatian dan kehadiran Bapak/Ibu, kami ucapkan terima kasih.\n\nWassalamu'alaikum Warahmatullahi Wabarakatuh ✨`;
+            copiedCode = `Assalamu'alaikum Warahmatullahi Wabarakatuh ${invitationEmoji.prayer}\n\nKepada Yth.\n*Bapak/Ibu ${reservation.guestName}*\n\nDengan hormat, kami mengundang Bapak/Ibu untuk menghadiri acara ${agendaLabel} yang insyaallah akan diselenggarakan pada:\n\n${invitationEmoji.calendar} *Tanggal:* ${invitationDate}\n${invitationEmoji.location} *Tempat:* ${invitationVenue}\n${invitationEmoji.clock} *Waktu:* ${invitationTime}\n\n${invitationEmoji.warning} Undangan ini berlaku untuk 1 orang.\n\n${agendaDescription}${confirmationText}\n\nAtas perhatian dan kehadiran Bapak/Ibu, kami ucapkan terima kasih.\n\nWassalamu'alaikum Warahmatullahi Wabarakatuh ${invitationEmoji.sparkle}`;
             await navigator.clipboard.writeText(copiedCode);
 
             // Increment copy count in database
@@ -283,7 +311,7 @@
         const agendaDescription = isManasik
             ? "Kegiatan manasik ini diselenggarakan sebagai pembekalan agar Bapak/Ibu dapat memahami rangkaian ibadah umroh, tata cara pelaksanaannya, serta berbagai persiapan yang diperlukan. Mengingat pentingnya materi yang akan disampaikan, kami sangat mengharapkan kehadiran Bapak/Ibu."
             : "Acara ini menjadi momen silaturahmi sekaligus mempererat kebersamaan keluarga besar The Sultan Umroh. Kehadiran Bapak/Ibu akan menjadi kehormatan dan kebahagiaan bagi kami.";
-        const confirmationText = `\n\nUntuk melakukan konfirmasi kehadiran, silakan mengunjungi tautan berikut:\n🔗 ${invitationUrl}`;
+        const confirmationText = `\n\nUntuk melakukan konfirmasi kehadiran, silakan mengunjungi tautan berikut:\n${invitationEmoji.link} ${invitationUrl}`;
         const invitationDate = isManasik
             ? invitationManasik.date
             : invitation.date;
@@ -293,10 +321,10 @@
         const invitationTime = isManasik
             ? invitationManasik.time
             : invitation.time;
-        const messageText = `Assalamu'alaikum Warahmatullahi Wabarakatuh 🙏\n\nKepada Yth.\n*Bapak/Ibu ${reservation.guestName}*\n\nDengan hormat, kami mengundang Bapak/Ibu untuk menghadiri acara ${agendaLabel} yang insyaallah akan diselenggarakan pada:\n\n📅 *Tanggal:* ${invitationDate}\n📍 *Tempat:* ${invitationVenue}\n🕒 *Waktu:* ${invitationTime}\n\n⚠️ Undangan ini berlaku untuk 1 orang.\n\n${agendaDescription}${confirmationText}\n\nAtas perhatian dan kehadiran Bapak/Ibu, kami ucapkan terima kasih.\n\nWassalamu'alaikum Warahmatullahi Wabarakatuh ✨`;
+        const messageText = `Assalamu'alaikum Warahmatullahi Wabarakatuh ${invitationEmoji.prayer}\n\nKepada Yth.\n*Bapak/Ibu ${reservation.guestName}*\n\nDengan hormat, kami mengundang Bapak/Ibu untuk menghadiri acara ${agendaLabel} yang insyaallah akan diselenggarakan pada:\n\n${invitationEmoji.calendar} *Tanggal:* ${invitationDate}\n${invitationEmoji.location} *Tempat:* ${invitationVenue}\n${invitationEmoji.clock} *Waktu:* ${invitationTime}\n\n${invitationEmoji.warning} Undangan ini berlaku untuk 1 orang.\n\n${agendaDescription}${confirmationText}\n\nAtas perhatian dan kehadiran Bapak/Ibu, kami ucapkan terima kasih.\n\nWassalamu'alaikum Warahmatullahi Wabarakatuh ${invitationEmoji.sparkle}`;
 
-        const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(messageText)}`;
-        window.open(whatsappUrl, "_blank");
+        const whatsappUrl = createWhatsAppUrl(formattedPhone, messageText);
+        window.open(whatsappUrl, "_blank", "noopener,noreferrer");
     }
 
     async function checkInGuest(reservation: any) {

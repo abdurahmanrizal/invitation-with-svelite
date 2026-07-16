@@ -33,6 +33,7 @@
         calendar: String.fromCodePoint(0x1f4c5),
         location: String.fromCodePoint(0x1f4cd),
         clock: String.fromCodePoint(0x1f552),
+        clothing: String.fromCodePoint(0x1f455),
         warning: String.fromCodePoint(0x26a0, 0xfe0f),
         link: String.fromCodePoint(0x1f517),
         sparkle: String.fromCodePoint(0x2728),
@@ -68,6 +69,17 @@
     let activeTab = $state<"mitra" | "jamaah">("jamaah");
     let currentPage = $state(1);
     let itemsPerPage = 10;
+    let confirmationModal = $state<{
+        isOpen: boolean;
+        action: "check_in" | "undo_check_in" | "delete" | null;
+        reservation: any | null;
+        isProcessing: boolean;
+    }>({
+        isOpen: false,
+        action: null,
+        reservation: null,
+        isProcessing: false,
+    });
 
     let filteredReservations = $derived(
         reservations.filter((r) => {
@@ -178,9 +190,6 @@
     }
 
     async function deleteReservation(id: number) {
-        if (!confirm("Are you sure you want to delete this reservation?"))
-            return;
-
         try {
             const response = await fetch(
                 `${PUBLIC_PHP_API_URL}/reservations.php`,
@@ -196,6 +205,86 @@
             }
         } catch (error) {
             message = { type: "error", text: "Failed to delete" };
+        }
+    }
+
+    function openConfirmationModal(
+        action: "check_in" | "undo_check_in" | "delete",
+        reservation: any,
+    ) {
+        confirmationModal = {
+            isOpen: true,
+            action,
+            reservation,
+            isProcessing: false,
+        };
+    }
+
+    function closeConfirmationModal() {
+        if (confirmationModal.isProcessing) return;
+
+        confirmationModal = {
+            isOpen: false,
+            action: null,
+            reservation: null,
+            isProcessing: false,
+        };
+    }
+
+    function getConfirmationContent() {
+        switch (confirmationModal.action) {
+            case "check_in":
+                return {
+                    title: "Konfirmasi Check-in",
+                    description: `Apakah Anda yakin ingin melakukan check-in untuk ${confirmationModal.reservation?.guestName}?`,
+                    confirmLabel: "Ya, Check-in",
+                    confirmClass: "bg-emerald-500 hover:bg-emerald-400",
+                };
+            case "undo_check_in":
+                return {
+                    title: "Batalkan Check-in",
+                    description: `Apakah Anda yakin ingin membatalkan check-in ${confirmationModal.reservation?.guestName}?`,
+                    confirmLabel: "Ya, Batalkan",
+                    confirmClass: "bg-orange-500 hover:bg-orange-400",
+                };
+            case "delete":
+                return {
+                    title: "Hapus Pengguna",
+                    description: `Apakah Anda yakin ingin menghapus ${confirmationModal.reservation?.guestName}? Data yang dihapus tidak dapat dipulihkan.`,
+                    confirmLabel: "Ya, Hapus",
+                    confirmClass: "bg-red-500 hover:bg-red-400",
+                };
+            default:
+                return {
+                    title: "Konfirmasi",
+                    description: "Apakah Anda yakin ingin melanjutkan?",
+                    confirmLabel: "Ya, Lanjutkan",
+                    confirmClass: "bg-amber-500 hover:bg-amber-400",
+                };
+        }
+    }
+
+    async function confirmReservationAction() {
+        const { action, reservation } = confirmationModal;
+        if (!action || !reservation || confirmationModal.isProcessing) return;
+
+        confirmationModal.isProcessing = true;
+
+        try {
+            if (action === "check_in") {
+                await checkInGuest(reservation);
+            } else if (action === "undo_check_in") {
+                await undoCheckIn(reservation);
+            } else {
+                await deleteReservation(reservation.id);
+            }
+        } finally {
+            confirmationModal = {
+                isOpen: false,
+                action: null,
+                reservation: null,
+                isProcessing: false,
+            };
         }
     }
 
@@ -273,7 +362,10 @@
             const invitationTime = isManasik
                 ? invitationManasik.time
                 : invitation.time;
-            copiedCode = `Assalamu'alaikum Warahmatullahi Wabarakatuh ${invitationEmoji.prayer}\n\nKepada Yth.\n*Bapak/Ibu ${reservation.guestName}*\n\nDengan hormat, kami mengundang Bapak/Ibu untuk menghadiri acara ${agendaLabel} yang insyaallah akan diselenggarakan pada:\n\n${invitationEmoji.calendar} *Tanggal:* ${invitationDate}\n${invitationEmoji.location} *Tempat:* ${invitationVenue}\n${invitationEmoji.clock} *Waktu:* ${invitationTime}\n\n${invitationEmoji.warning} Undangan ini berlaku untuk 1 orang.\n\n${agendaDescription}${confirmationText}\n\nAtas perhatian dan kehadiran Bapak/Ibu, kami ucapkan terima kasih.\n\nWassalamu'alaikum Warahmatullahi Wabarakatuh ${invitationEmoji.sparkle}`;
+            const dressCodeText = isManasik
+                ? `\n${invitationEmoji.clothing} *Busana:* Busana muslim berwarna putih`
+                : "";
+            copiedCode = `Assalamu'alaikum Warahmatullahi Wabarakatuh ${invitationEmoji.prayer}\n\nKepada Yth.\n*Bapak/Ibu ${reservation.guestName}*\n\nDengan hormat, kami mengundang Bapak/Ibu untuk menghadiri acara ${agendaLabel} yang insyaallah akan diselenggarakan pada:\n\n${invitationEmoji.calendar} *Tanggal:* ${invitationDate}\n${invitationEmoji.location} *Tempat:* ${invitationVenue}\n${invitationEmoji.clock} *Waktu:* ${invitationTime}${dressCodeText}\n\n${invitationEmoji.warning} Undangan ini berlaku untuk 1 orang.\n\n${agendaDescription}${confirmationText}\n\nAtas perhatian dan kehadiran Bapak/Ibu, kami ucapkan terima kasih.\n\nWassalamu'alaikum Warahmatullahi Wabarakatuh ${invitationEmoji.sparkle}`;
             await navigator.clipboard.writeText(copiedCode);
 
             // Increment copy count in database
@@ -321,7 +413,10 @@
         const invitationTime = isManasik
             ? invitationManasik.time
             : invitation.time;
-        const messageText = `Assalamu'alaikum Warahmatullahi Wabarakatuh ${invitationEmoji.prayer}\n\nKepada Yth.\n*Bapak/Ibu ${reservation.guestName}*\n\nDengan hormat, kami mengundang Bapak/Ibu untuk menghadiri acara ${agendaLabel} yang insyaallah akan diselenggarakan pada:\n\n${invitationEmoji.calendar} *Tanggal:* ${invitationDate}\n${invitationEmoji.location} *Tempat:* ${invitationVenue}\n${invitationEmoji.clock} *Waktu:* ${invitationTime}\n\n${invitationEmoji.warning} Undangan ini berlaku untuk 1 orang.\n\n${agendaDescription}${confirmationText}\n\nAtas perhatian dan kehadiran Bapak/Ibu, kami ucapkan terima kasih.\n\nWassalamu'alaikum Warahmatullahi Wabarakatuh ${invitationEmoji.sparkle}`;
+        const dressCodeText = isManasik
+            ? `\n${invitationEmoji.clothing} *Busana:* Busana muslim berwarna putih`
+            : "";
+        const messageText = `Assalamu'alaikum Warahmatullahi Wabarakatuh ${invitationEmoji.prayer}\n\nKepada Yth.\n*Bapak/Ibu ${reservation.guestName}*\n\nDengan hormat, kami mengundang Bapak/Ibu untuk menghadiri acara ${agendaLabel} yang insyaallah akan diselenggarakan pada:\n\n${invitationEmoji.calendar} *Tanggal:* ${invitationDate}\n${invitationEmoji.location} *Tempat:* ${invitationVenue}\n${invitationEmoji.clock} *Waktu:* ${invitationTime}${dressCodeText}\n\n${invitationEmoji.warning} Undangan ini berlaku untuk 1 orang.\n\n${agendaDescription}${confirmationText}\n\nAtas perhatian dan kehadiran Bapak/Ibu, kami ucapkan terima kasih.\n\nWassalamu'alaikum Warahmatullahi Wabarakatuh ${invitationEmoji.sparkle}`;
 
         const whatsappUrl = createWhatsAppUrl(formattedPhone, messageText);
         window.open(whatsappUrl, "_blank", "noopener,noreferrer");
@@ -802,7 +897,10 @@
                                 {#if reservation.status !== "checked_in"}
                                     <button
                                         onclick={() =>
-                                            checkInGuest(reservation)}
+                                            openConfirmationModal(
+                                                "check_in",
+                                                reservation,
+                                            )}
                                         class="rounded-lg bg-emerald-400/10 p-2.5 transition-colors hover:bg-emerald-400/20"
                                         title="Check In"
                                     >
@@ -813,7 +911,11 @@
                                     </button>
                                 {:else}
                                     <button
-                                        onclick={() => undoCheckIn(reservation)}
+                                        onclick={() =>
+                                            openConfirmationModal(
+                                                "undo_check_in",
+                                                reservation,
+                                            )}
                                         class="rounded-lg bg-orange-400/10 p-2.5 transition-colors hover:bg-orange-400/20"
                                         title="Undo Check In"
                                     >
@@ -829,7 +931,10 @@
                                 </button>
                                 <button
                                     onclick={() =>
-                                        deleteReservation(reservation.id)}
+                                        openConfirmationModal(
+                                            "delete",
+                                            reservation,
+                                        )}
                                     class="rounded-lg bg-red-400/10 p-2.5 transition-colors hover:bg-red-400/20"
                                     title="Delete"
                                 >
@@ -935,7 +1040,8 @@
                                             {#if reservation.status !== "checked_in"}
                                                 <button
                                                     onclick={() =>
-                                                        checkInGuest(
+                                                        openConfirmationModal(
+                                                            "check_in",
                                                             reservation,
                                                         )}
                                                     class="rounded-lg p-2 hover:bg-emerald-400/10 transition-colors"
@@ -949,7 +1055,8 @@
                                             {:else}
                                                 <button
                                                     onclick={() =>
-                                                        undoCheckIn(
+                                                        openConfirmationModal(
+                                                            "undo_check_in",
                                                             reservation,
                                                         )}
                                                     class="rounded-lg p-2 hover:bg-orange-400/10 transition-colors"
@@ -977,8 +1084,9 @@
                                             </button>
                                             <button
                                                 onclick={() =>
-                                                    deleteReservation(
-                                                        reservation.id,
+                                                    openConfirmationModal(
+                                                        "delete",
+                                                        reservation,
                                                     )}
                                                 class="rounded-lg p-2 hover:bg-red-400/10 transition-colors"
                                                 title="Delete"
@@ -1079,3 +1187,79 @@
         </Card>
     </div>
 </div>
+
+{#if confirmationModal.isOpen}
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <button
+            type="button"
+            class="absolute inset-0 cursor-default bg-slate-950/75 backdrop-blur-sm"
+            aria-label="Tutup modal konfirmasi"
+            onclick={closeConfirmationModal}
+        ></button>
+
+        <dialog
+            open
+            class="relative m-0 w-full max-w-md rounded-2xl border border-white/10 bg-slate-900 p-6 text-white shadow-2xl"
+            aria-modal="true"
+            aria-labelledby="confirmation-modal-title"
+            aria-describedby="confirmation-modal-description"
+        >
+            <div
+                class="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full {confirmationModal.action ===
+                'delete'
+                    ? 'bg-red-400/10 text-red-400'
+                    : confirmationModal.action === 'undo_check_in'
+                      ? 'bg-orange-400/10 text-orange-400'
+                      : 'bg-emerald-400/10 text-emerald-400'}"
+            >
+                {#if confirmationModal.action === "delete"}
+                    <Trash2 size={22} />
+                {:else if confirmationModal.action === "undo_check_in"}
+                    <X size={22} />
+                {:else}
+                    <Check size={22} />
+                {/if}
+            </div>
+
+            <h2
+                id="confirmation-modal-title"
+                class="text-center text-xl font-semibold text-white"
+            >
+                {getConfirmationContent().title}
+            </h2>
+            <p
+                id="confirmation-modal-description"
+                class="mt-2 text-center text-sm leading-6 text-slate-300"
+            >
+                {getConfirmationContent().description}
+            </p>
+
+            <div
+                class="mt-6 flex flex-col-reverse justify-center gap-3 sm:flex-row"
+            >
+                <button
+                    type="button"
+                    class="w-full rounded-full border border-white/15 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-white/10 disabled:opacity-50 sm:w-auto"
+                    disabled={confirmationModal.isProcessing}
+                    onclick={closeConfirmationModal}
+                >
+                    Batal
+                </button>
+                <button
+                    type="button"
+                    class="inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium text-white transition-colors disabled:pointer-events-none disabled:opacity-60 sm:w-auto {getConfirmationContent()
+                        .confirmClass}"
+                    disabled={confirmationModal.isProcessing}
+                    onclick={confirmReservationAction}
+                >
+                    {#if confirmationModal.isProcessing}
+                        <Loader2 size={16} class="animate-spin" />
+                        Memproses...
+                    {:else}
+                        {getConfirmationContent().confirmLabel}
+                    {/if}
+                </button>
+            </div>
+        </dialog>
+    </div>
+{/if}

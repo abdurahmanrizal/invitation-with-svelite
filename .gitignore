@@ -5,6 +5,7 @@ node_modules
 
 # Build outputs
 build
+build.zip
 .svelte-kit
 dist
 

@@ -19,7 +19,7 @@ export const invitationManasik = {
     "A serene evening of silaturahmi, reflection, and preparation for the blessed journey.",
   date: "Minggu, 19 Juli 2026",
   time: "09:00 - Selesai WIB",
-  venue: "Kantor The Sultan",
+  venue: "Kantor The Sultan - Lantai 2",
   address:
     "Jl. Kaligawe Raya No.KM. 4, Terboyo Kulon, Kec. Genuk, Kota Semarang, Jawa Tengah 50112",
   mapUrl: "https://maps.app.goo.gl/y5fD3tzm2FBfo6KJ9",

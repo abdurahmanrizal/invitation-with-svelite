@@ -304,17 +304,31 @@
                                     <p
                                         class="mt-3 font-medium text-gold text-xl md:text-2xl"
                                     >
-                                        {invitation.date}
+                                        {#if reservation.category === "mitra"}
+                                            {invitation.date}
+                                        {:else if reservation.category === "jamaah"}
+                                            {invitationManasik.date}
+                                        {:else}
+                                            -
+                                        {/if}
                                     </p>
                                     <p
                                         class="text-gold-light text-xl md:text-2xl"
                                     >
-                                        {invitation.time}
+                                        {#if reservation.category === "mitra"}
+                                            {invitation.time}
+                                        {:else if reservation.category === "jamaah"}
+                                            {invitationManasik.time}
+                                        {:else}
+                                            -
+                                        {/if}
                                     </p>
                                 </div>
 
                                 <a
-                                    href={invitation.mapUrl}
+                                    href={reservation.category === "mitra"
+                                        ? invitation.mapUrl
+                                        : invitationManasik.mapUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     class="rounded-2xl border p-4 block transition-opacity hover:opacity-80"
